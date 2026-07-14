@@ -20,7 +20,7 @@ public class IndexController {
         this.categoriaService = categoriaService;
     }
     
-    @GetMapping("/")
+    @GetMapping({"/", "/index"})
     public String cargarPaginaInicio(Model model) {
         var lista = productoService.getProductos(true);
         model.addAttribute("productos", lista);

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-    <head th:replace="~{general/plantilla :: head}"/>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head th:replace="~{general/fragmentos :: head}"></head>
 
     <body>
         <!-- fragmento 1 para Agregar producto en ventana modal -->
@@ -10,7 +10,7 @@
             <!-- Button trigger modal -->
             <div class='row py-4 mb-2 bg-light'>
                 <div class='col-md-1'></div>
-                <div class='col-md-3' sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class='col-md-3' sec:authorize="hasRole('ADMIN')">
                     <button type="button" class="btn btn-primary"
                             data-bs-toggle="modal" data-bs-target="#agregarProductoModal">
                         <i class="fa-solid fa-plus"></i> [[#{producto.agregar}]]</button>
@@ -26,7 +26,7 @@
                                 <i class="fa-solid fa-layer-group"></i> [[#{producto.agregar}]]</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form th:action='@{/producto/guardar}' th:object='${producto}'
+                        <form th:action='@{/producto/guardar}'
                               class='was-validated' enctype="multipart/form-data" method="post">
                             <div class="modal-body">
                                 <div class="mb-3">
@@ -95,7 +95,7 @@
                                             <th>[[#{producto.imagen}]]</th>
                                             <th>[[#{producto.categoria}]]</th>
                                             <th>[[#{producto.activo}]]</th>
-                                            <th sec:authorize="hasRole('ROLE_ADMIN')"></th>
+                                            <th sec:authorize="hasRole('ADMIN')"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,10 +105,13 @@
                                             <td class="text-end">[[${#numbers.formatCurrency(p.precio)}]]</td>
                                             <td class="text-center">[[${p.existencias}]]</td>
                                             <td class="text-end">[[${#numbers.formatCurrency(p.precio*p.existencias)}]]</td>
-                                            <td><img th:src="@{${p.rutaImagen}}" alt="noData" height="75"/></td>
-                                            <td>[[${p.categoria.idcategoria}]]</td>
+                                            <td>
+                                                <img th:if="${p.rutaImagen != null}" th:src="${p.rutaImagen}"
+                                                     alt="Imagen del producto" height="75"/>
+                                            </td>
+                                            <td>[[${p.categoria.idCategoria}]]</td>
                                             <td th:text="${p.activo} ? 'Activa':'Inactiva'"></td>
-                                            <td sec:authorize="hasRole('ROLE_ADMIN')">
+                                            <td sec:authorize="hasRole('ADMIN')">
                                                 <button type="button" class="btn btn-danger"
                                                         data-bs-toggle="modal" data-bs-target="#confirmModal"
                                                         th:data-bs-id="${p.idProducto}"
@@ -194,7 +197,8 @@
                                             <label>[[#{producto.imagen}]]</label>
                                             <input class="form-control" type="file" name="imagenFile"
                                                    onchange="mostrarImagen(this);" />
-                                            <img id="blah" th:src="@{${producto.rutaImagen}}" alt="your image" height="200"/>
+                                            <img id="blah" th:if="${producto.rutaImagen != null}"
+                                                 th:src="${producto.rutaImagen}" alt="Imagen del producto" height="200"/>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +218,7 @@
                  aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered custom-modal-animation">
                     <div class="modal-content animate-slide-up">
-                        <form th:action="@{/producto/eliminar}" th:object="${producto}" method="post">
+                        <form th:action="@{/producto/eliminar}" method="post">
                             <input type="hidden" name="idProducto" id="modalId"/>
                             <div class="modal-header bg-warning text-white">
                                 <h5 class="modal-title" id="modalLabel">
